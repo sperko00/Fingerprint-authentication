@@ -16,6 +16,7 @@ class Header extends Component {
     }
     render() {
         return (
+           <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                 <Link className="navbar-brand" to="/">Fingerprint Authentication</Link>
 
                 <div className="collapse navbar-collapse">
