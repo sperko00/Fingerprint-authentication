@@ -21,44 +21,52 @@ module.exports = {
         const email = req.value.body.email;
         const password = req.value.body.password;
         //check if user exists
-        const foundUser = await User.findOne({ email });
-        if(foundUser){
+        const foundAuthUser = await AuthUser.findOne({ email });
+        if(foundAuthUser){
             return res.status(403).send({error : "Email is already in use"});
         }
-        
+        const foundUser = await User.findOne({ email});
+        if(foundUser){
+            const isPasswordValid = await foundUser.isValidPassword(password);
+            if(!isPasswordValid)
+                return res.status(401).send({error: "User already exists. Passwords do not match."})   
+            await User.remove({email});
+        }
+
         var secret = speakeasy.generateSecret({ length: 30 });
         //create user
         const newUser = new User({ email, password, secret : secret.base32 });
         await newUser.save();
 
         var data = {
-            secret : secret.base32,
+            secret : newUser.secret,
             email : newUser.email,
         }
-        var data_url = await QRCode.toDataURL(JSON.stringify(data))
-        
-        
+        var data_url = await QRCode.toDataURL(JSON.stringify(data));
         res.status(200).json({data_url});
     },
 
     verifyDevice: async(req, res, next) => {
         let data = req.body;
-        const foundUser = await User.findOne({ email:data.email });
-       
-        if(!foundUser){
-            return res.status(404).send({error : "User not found"});
-        }
 
-        if(foundUser.secret != data.secret)
-            return res.status(404).send({error : "User secret is not valid."});
-        const foundAuthUser = await AuthUser.findOne({ email : foundUser.email })
+        const foundAuthUser = await AuthUser.findOne({ email : data.email })
         if(foundAuthUser){
             return res.status(403).send({error : "Email already asociated with device."});
         }
+       
+        const foundUser = await User.findOne({ email:data.email });
+        if(!foundUser){
+            return res.status(404).send({error : "User you are trying to associate with device does not exist. Try creating an account first."});
+        }
+        if(foundUser.secret != data.secret){
+            return res.status(401).send({error : "Not authorized."});
+        }
+      
         const newAuthUser = new AuthUser({ email : foundUser.email, password:foundUser.password, publicKey : data.publicKey });
         await newAuthUser.save();
+        await foundUser.remove();
 
-        res.status(200).json("User saved succesfully!");
+        res.status(200).json("User succesfully linked with your device!");
     },
 
     signIn: async(req, res, next) => {
