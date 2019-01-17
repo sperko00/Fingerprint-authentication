@@ -12,6 +12,7 @@ import App from './components/App';
 import Home from './components/Home';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
+import VerifyPhone from './components/VerifyPhone';
 import Dashboard from './components/Dashboard';
 import reducers from './reducers';
 
@@ -35,6 +36,7 @@ ReactDOM.render(
                 <Route exact path="/" component={Home} />
                 <Route exact path="/signin" component={SignIn}/>
                 <Route exact path="/signup" component={SignUp}/>
+                <Route exact path="/verifyphone" component={VerifyPhone}/>
                 <Route exact path="/dashboard" component={authGuard(Dashboard)}/>
             </App>
         </BrowserRouter>

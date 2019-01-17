@@ -9,7 +9,7 @@ export default ( state = DEFAULT_STATE, action ) => {
 
     switch(action.type){
         case AUTH_SIGN_UP : 
-            return { ...state, token : action.payload, isAuthenticated : true, errorMessage : '' }
+            return { ...state, data_url : action.payload, isAuthenticated : false, errorMessage : '' }
         case AUTH_SIGN_IN :
             return { ...state, token : action.payload,isAuthenticated : true, errorMessage : '' }
         case AUTH_SIGN_OUT :

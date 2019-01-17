@@ -7,10 +7,10 @@ export const signUp = data => {
             const res = await axios.post('http://localhost:5000/users/signup', data);
             dispatch({
                 type: AUTH_SIGN_UP,
-                payload: res.data.token,
+                payload: res.data.data_url,
             })
-            localStorage.setItem('JWT_TOKEN', res.data.token);
-            axios.defaults.headers.common['Authorization'] = res.data.token;
+            //localStorage.setItem('JWT_TOKEN', res.data.token);
+            //axios.defaults.headers.common['Authorization'] = res.data.token;
         }
         catch(error) {
             dispatch({
@@ -30,6 +30,7 @@ export const signIn = data => {
                 payload: res.data.token,
             })
             localStorage.setItem('JWT_TOKEN', res.data.token);
+            console.log(res.data.token);
             axios.defaults.headers.common['Authorization'] = res.data.token;
         }
         catch(error) {

@@ -16,7 +16,7 @@ class SignUp extends Component {
         await this.props.signUp(formdata);
         if(!this.props.errorMessage)
         {
-            this.props.history.push('/dashboard');
+            this.props.history.push('/verifyphone');
         }
     }
 
