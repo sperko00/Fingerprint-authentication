@@ -1,6 +1,7 @@
 const JWT = require('jsonwebtoken');
 var speakeasy = require('speakeasy');
 var QRCode = require('qrcode');
+var crypto = require('crypto');
 
 const User = require('../models/user');
 const AuthUser = require('../models/authUser');
@@ -46,9 +47,17 @@ module.exports = {
         res.status(200).json({data_url});
     },
 
-    verifyDevice: async(req, res, next) => {
+    registerDevice: async(req, res, next) => {
         let data = req.body;
-
+        let verify = crypto.createVerify('SHA256');
+        let objectToVerify = {...data};
+        delete objectToVerify.signature;
+        let verifyString = JSON.stringify(objectToVerify);
+        let PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\n"+data.publicKey+"\n"+"-----END PUBLIC KEY-----";
+        verify.write(verifyString);
+        var isSignatureValid = verify.verify(PUBLIC_KEY,data.signature,'base64');
+        if(!isSignatureValid)
+            return res.status(401).send({error : "Signature is not valid"});
         const foundAuthUser = await AuthUser.findOne({ email : data.email })
         if(foundAuthUser){
             return res.status(403).send({error : "Email already asociated with device."});

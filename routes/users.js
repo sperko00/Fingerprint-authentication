@@ -14,8 +14,8 @@ router.route('/signup')
 router.route('/signin')
     .post(validateBody(schemas.authSchema),passportSignIn,UsersController.signIn);
 
-router.route('/verifyDevice')
-    .post(UsersController.verifyDevice);
+router.route('/registerDevice')
+    .post(UsersController.registerDevice);
 
 router.route('/secret')
     .get(passportJWT, UsersController.secret);
