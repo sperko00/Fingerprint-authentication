@@ -25,13 +25,6 @@ export class Home extends Component {
   constructor(props)
   {
     super(props);
-    this.state = {appState : 0}
-  }
-  handleRegisterDevice = () => {
-    this.setState({appState : 1});
-  }
-  handleScanFingerprint = () => {
-    this.setState({appState : 2});
   }
   render() {
     return (

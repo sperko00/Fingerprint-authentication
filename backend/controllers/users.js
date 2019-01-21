@@ -82,9 +82,6 @@ module.exports = {
         const token = signToken(req.user);
         res.status(200).json({ token });
     },
-
-    
-
     secret: async(req, res, next) => {
         res.json({resource : "secret"});
     }

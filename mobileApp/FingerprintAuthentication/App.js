@@ -8,9 +8,9 @@ import { createStackNavigator, createAppContainer } from "react-navigation";
 
 const AppNavigator = createStackNavigator(
   {
-    Home: Home,
-    RegisterDevice : RegisterDevice,
-    ScanFingerprint : ScanFingerprint,
+    Home,
+    RegisterDevice ,
+    ScanFingerprint ,
   },
   {
     initialRouteName: "Home"

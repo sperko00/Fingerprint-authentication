@@ -3,7 +3,7 @@ import { Alert, StyleSheet, Text, View, Button } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import Biometrics from 'react-native-biometrics'
 
-var SERVER_URL = "http://24251502.ngrok.io";
+var SERVER_URL = "http://c43c9108.ngrok.io";
 
 export class RegisterDevice extends Component {
   static navigationOptions = {
@@ -78,8 +78,6 @@ export class RegisterDevice extends Component {
   }
   
   render() {
-    let activeComponent = null;
-
     return (
       <View style={styles.container}>
         <QRCodeScanner 

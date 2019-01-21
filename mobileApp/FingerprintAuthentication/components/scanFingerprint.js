@@ -25,8 +25,6 @@ export class ScanFingerprint extends Component {
     },
   }
   render() {
-    let activeComponent = null;
-
     return (
       <View style={styles.container}>
             <Text>Scan Finger</Text>
