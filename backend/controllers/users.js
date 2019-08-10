@@ -5,6 +5,8 @@ var crypto = require('crypto');
 
 const User = require('../models/user');
 const AuthUser = require('../models/authUser');
+const WaitSignature = require('../models/waitSignature');
+
 
 const { JWT_SECRET } = require('../configuration/config'); 
 
@@ -79,9 +81,54 @@ module.exports = {
     },
 
     signIn: async(req, res, next) => {
-        const token = signToken(req.user);
+        let data = req.body;
+        //const token = signToken(req.user);
+        const foundUser = await WaitSignature.findOne({ email : req.user.email});
+        if(foundUser)
+            foundUser.remove();
+        const newWaitSignatureUser = new WaitSignature({ email : req.user.email, isAuthenticated : false});
+        await newWaitSignatureUser.save();
+        res.status(200).json({ email : req.user.email });
+    },
+    verifyFingerprint: async(req, res, next) => {
+        let data = req.body;
+        let verify = crypto.createVerify('SHA256');
+        let objectToVerify = {...data};
+        delete objectToVerify.signature;
+        let verifyString = JSON.stringify(objectToVerify);
+        const user = await AuthUser.findOne({email : data.email});
+        if(!user)
+            return res.status(404).send({error : "User not found."});
+        let PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\n"+user.publicKey+"\n"+"-----END PUBLIC KEY-----";
+        verify.write(verifyString);
+        var isSignatureValid = verify.verify(PUBLIC_KEY,data.signature,'base64');
+        if(!isSignatureValid)
+            return res.status(401).send({error : "Signature is not valid"});
+        const waitSignatureUser = await WaitSignature.findOne({email : data.email});
+        if(!waitSignatureUser)
+            return res.status(404).send({error : "This user is not trying to sign in."});
+        
+        const isUpdated = await WaitSignature.updateOne({ email: data.email }, {isAuthenticated : true });
+        if(isUpdated.n == 0)
+            return res.status(404).send({error : "User not found"});
+        res.status(200).send({message : "User authenticated successfully"});
+        
+    },
+    login: async(req, res, next) => {
+        const waitSignatureUser = await WaitSignature.findOne({ email : req.body.email, isAuthenticated : true});
+        console.log(req.body);
+        console.log(waitSignatureUser);
+        if(!waitSignatureUser)
+            return res.send({token : null});
+
+        const authUser = await AuthUser.findOne({email :  req.body.email})
+        if(!authUser)
+            return res.send({token : null});
+        const token = signToken(authUser);
+        console.log(token);
         res.status(200).json({ token });
     },
+
     secret: async(req, res, next) => {
         res.json({resource : "secret"});
     }

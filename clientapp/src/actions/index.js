@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AUTH_SIGN_UP, AUTH_ERROR, AUTH_SIGN_OUT, AUTH_SIGN_IN, SHOW_DASHBOARD_SECRET } from './types';
+import { AUTH_SIGN_UP, AUTH_ERROR, AUTH_SIGN_OUT, AUTH_SIGN_IN, SHOW_DASHBOARD_SECRET, AUTH_LOGIN } from './types';
 
 export const signUp = data => {
     return async dispatch => {
@@ -12,10 +12,10 @@ export const signUp = data => {
             //localStorage.setItem('JWT_TOKEN', res.data.token);
             //axios.defaults.headers.common['Authorization'] = res.data.token;
         }
-        catch(error) {
+        catch (error) {
             dispatch({
                 type: AUTH_ERROR,
-                payload:"Email is already in use",
+                payload: "Email is already in use",
             })
         }
     }
@@ -27,31 +27,49 @@ export const signIn = data => {
             const res = await axios.post('http://localhost:5000/users/signin', data);
             dispatch({
                 type: AUTH_SIGN_IN,
-                payload: res.data.token,
+                payload: res.data.email,
             })
-            localStorage.setItem('JWT_TOKEN', res.data.token);
-            console.log(res.data.token);
-            axios.defaults.headers.common['Authorization'] = res.data.token;
         }
-        catch(error) {
+        catch (error) {
             dispatch({
                 type: AUTH_ERROR,
-                payload:"Email or password incorrect",
+                payload: "Email or password incorrect",
+            })
+        }
+    }
+}
+export const login = data => {
+    return async dispatch => {
+        try {
+            const res = await axios.post('http://localhost:5000/users/login', { email: data });
+            if (res.data.token != null) {
+                dispatch({
+                    type: AUTH_LOGIN,
+                    payload: res.data.token,
+                })
+                localStorage.setItem('JWT_TOKEN', res.data.token);
+                axios.defaults.headers.common['Authorization'] = res.data.token;
+            }
+        }
+        catch (error) {
+            dispatch({
+                type: AUTH_ERROR,
+                payload: "Email or password incorrect",
             })
         }
     }
 }
 export const getSecret = () => {
     return async dispatch => {
-        try{
+        try {
             const res = await axios.get('http://localhost:5000/users/secret');
             dispatch({
-                type : SHOW_DASHBOARD_SECRET,
-                payload : res.data,
+                type: SHOW_DASHBOARD_SECRET,
+                payload: res.data,
             })
         }
-        catch(error){
-            console.error("error",error);
+        catch (error) {
+            console.error("error", error);
         }
     }
 }
@@ -61,8 +79,8 @@ export const signOut = () => {
         localStorage.removeItem('JWT_TOKEN');
         axios.defaults.headers.common['Authorization'] = '';
         dispatch({
-            type : AUTH_SIGN_OUT,
-            payload : ''
+            type: AUTH_SIGN_OUT,
+            payload: ''
         })
     }
 }

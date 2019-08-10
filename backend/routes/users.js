@@ -16,7 +16,10 @@ router.route('/signin')
 
 router.route('/registerDevice')
     .post(UsersController.registerDevice);
-
+router.route('/verifyFingerprint')
+    .post(UsersController.verifyFingerprint);
+    router.route('/login')
+    .post(UsersController.login);
 router.route('/secret')
     .get(passportJWT, UsersController.secret);
 

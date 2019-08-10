@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, Button } from 'react-native';
-
 export class Home extends Component {
   static navigationOptions = {
     title: 'Fingerprint Autheticator',
@@ -26,6 +25,7 @@ export class Home extends Component {
   {
     super(props);
   }
+  
   render() {
     return (
       <View style={styles.container}>

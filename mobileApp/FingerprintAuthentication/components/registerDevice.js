@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { Alert, StyleSheet, Text, View, Button } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import Biometrics from 'react-native-biometrics'
+import { AsyncStorage } from "react-native";
 
-var SERVER_URL = "http://c43c9108.ngrok.io";
+var SERVER_URL = "http://9e4c2f75.ngrok.io";
 
 export class RegisterDevice extends Component {
   static navigationOptions = {
@@ -35,6 +36,7 @@ export class RegisterDevice extends Component {
     this.registerDevice = this.registerDevice.bind(this);
     this.sendDataToServer = this.sendDataToServer.bind(this);
   }
+  
   onSuccess(e){
     let dataFromQR = JSON.parse(e.data);
     this.generateSignature(dataFromQR);
@@ -62,19 +64,42 @@ export class RegisterDevice extends Component {
       });
   }
   async sendDataToServer(payload){
-      payload = JSON.stringify(payload);
+      var bodyPayload = {...payload};
+      bodyPayload = JSON.stringify(bodyPayload);
       await fetch(SERVER_URL+'/users/registerDevice',
       {
         method:'POST',
-        body: payload,
+        body: bodyPayload,
         headers:{
           'Content-Type': 'application/json'
         }
       })
       .then(res => res.json())
       .then((data) => {
-        //show alert with data.error message
+        this.storeEmail(payload.email);
       });
+  }
+  storeEmail = async (email) => {
+    var retreivedEmails = await this.retreiveEmails();
+    var newEmailArray = [];
+    if(retreivedEmails)
+    {
+      newEmailArray = JSON.parse(retreivedEmails);
+    }
+    newEmailArray.push(email);
+    try {
+      await AsyncStorage.setItem('FING_AUTH_EMAILS', JSON.stringify(newEmailArray));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  retreiveEmails = async () => {
+    try {
+      const emails = await AsyncStorage.getItem('FING_AUTH_EMAILS');
+        return emails;
+     } catch (error) {
+       // Error retrieving data
+     }
   }
   
   render() {
